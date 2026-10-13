@@ -1,8 +1,43 @@
 {
-  "source_commit": "fd3bd888f8212cd5dd77dca21dff331e8fd90033",
-  "run_url": "https://github.com/LOVE4KIMCHAEWON/pinscript-asic/actions/runs/38346980218",
+  "source_commit": "07c0cece8d6e671b7c5ff27bc5715701700c5004",
+  "run_url": "https://github.com/LOVE4KIMCHAEWON/pinscript-asic/actions/runs/38347520297",
   "rtl_sha256": "63094b6174e9cf79b682c9a9c22e7a05a2c11dffbfc4503b1e52b147c5875108",
   "netlist_sha256": "60cb932d8f718734aae5607b2ad9b796560d96e2c15714188be85b9ba07a2736",
+  "firmware_sha256": {
+    "i2c_write.bin": "071b5ba57607eae08887e7a10b637b17bb7e65e39ad97cf83bf546195cda064f",
+    "spi_duplex.bin": "9413f819753ad2f643a6cb349c389fafdd6e483f582f87b1c2959d5a826700d6",
+    "spi_mode0.bin": "2f43920cdbfadb31a25cde4f6f95c86e0ae05165efe7902baced01d6dfcace8c",
+    "uart_rx.bin": "d254f8a9e5ed255ca4d4ab67588c9c4cc5e3eb6ce32eb3b4063610789cb630a0",
+    "uart_tx.bin": "6014ef32b4c2fb6878ae37ab8f974a1d5b0a7c8da4c01d68e0e2f19ac7038420"
+  },
+  "synthesis": {
+    "cell_count": 3572,
+    "cell_types": {
+      "$_ANDNOT_": 350,
+      "$_AND_": 16,
+      "$_DFFE_PP_": 960,
+      "$_DFF_P_": 5,
+      "$_MUX_": 1516,
+      "$_NAND_": 23,
+      "$_NOR_": 68,
+      "$_NOT_": 136,
+      "$_ORNOT_": 36,
+      "$_OR_": 322,
+      "$_SDFFE_PN0P_": 13,
+      "$_SDFFE_PP0P_": 10,
+      "$_SDFF_PN0_": 69,
+      "$_SDFF_PN1_": 4,
+      "$_XNOR_": 3,
+      "$_XOR_": 41
+    },
+    "unmapped_memories": 0
+  },
+  "lint_warnings": [
+    "%Warning-DECLFILENAME: src/project.v:5:8: Filename 'project' does not match MODULE name: 'tt_um_pinscript'",
+    "%Warning-UNUSEDSIGNAL: src/project.v:19:15: Bits of signal are not used: 'mosi_sync'[2]",
+    "%Warning-UNUSEDSIGNAL: src/project.v:27:17: Bits of signal are not used: 'ir'[11]",
+    "%Warning-UNUSEDSIGNAL: src/project.v:44:15: Bits of signal are not used: 'spi_shift'[7]"
+  ],
   "suites": {
     "software": {
       "tests": 16,
@@ -10,12 +45,12 @@
       "skipped": 0
     },
     "rtl": {
-      "tests": 18,
+      "tests": 20,
       "failures": 0,
       "skipped": 0
     },
     "generic": {
-      "tests": 18,
+      "tests": 20,
       "failures": 0,
       "skipped": 0
     }
