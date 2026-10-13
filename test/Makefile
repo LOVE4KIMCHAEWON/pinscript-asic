@@ -19,5 +19,5 @@ endif
 COMPILE_ARGS += -I$(SRC_DIR)
 VERILOG_SOURCES += $(CURDIR)/tb.v
 TOPLEVEL = tb
-COCOTB_TEST_MODULES = test,test_control
+COCOTB_TEST_MODULES = test,test_control,test_protocol_edges
 include $(shell cocotb-config --makefiles)/Makefile.sim
