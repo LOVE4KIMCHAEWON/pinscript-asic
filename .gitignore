@@ -1,0 +1,9 @@
+# Keep build/*.hex, *.bin, *.lst committed as documented firmware artifacts.
+__pycache__/
+.pytest_cache/
+*.pyc
+*.vcd
+*.fst
+*.log
+test/sim_build/
+test/results.xml

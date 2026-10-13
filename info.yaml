@@ -1,0 +1,38 @@
+# Tiny Tapeout IHP CMOS5L 6x4 challenge configuration
+project:
+  title: "PinScript programmable protocol engine"
+  author: "LOVE4KIMCHAEWON"
+  discord: ""
+  description: "SPI-programmable, deterministic 8-pin PIO core for UART/SPI/I2C"
+  language: "Verilog"
+  clock_hz: 12000000
+  tiles: "6x4"
+  top_module: "tt_um_pinscript"
+  source_files:
+    - "project.v"
+pinout:
+  ui[0]: "CFG_SCLK"
+  ui[1]: "CFG_MOSI"
+  ui[2]: "CFG_CS_N"
+  ui[3]: "reserved"
+  ui[4]: "reserved"
+  ui[5]: "reserved"
+  ui[6]: "reserved"
+  ui[7]: "reserved"
+  uo[0]: "PC0"
+  uo[1]: "PC1"
+  uo[2]: "PC2"
+  uo[3]: "PC3"
+  uo[4]: "PC4"
+  uo[5]: "PC5"
+  uo[6]: "ZERO_FLAG"
+  uo[7]: "RUNNING"
+  uio[0]: "PIO0"
+  uio[1]: "PIO1"
+  uio[2]: "PIO2"
+  uio[3]: "PIO3"
+  uio[4]: "PIO4"
+  uio[5]: "PIO5"
+  uio[6]: "PIO6"
+  uio[7]: "PIO7"
+yaml_version: 6

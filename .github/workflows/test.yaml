@@ -1,0 +1,66 @@
+name: regression
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: regression-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install simulation and synthesis tools
+        run: |
+          python -m pip install -r requirements-test.txt
+          sudo apt-get update
+          sudo apt-get install -y iverilog yosys verilator
+      - name: Assemble firmware and test software reference
+        run: |
+          mkdir -p reports
+          make firmware
+          python -m pytest -q test/test_reference.py --junitxml=reports/software.xml | tee reports/software.log
+      - name: RTL pin-level and protocol regression
+        run: make rtl COCOTB_RESULTS_FILE=results-rtl.xml | tee reports/rtl.log
+      - name: Lint RTL
+        run: make lint 2>&1 | tee reports/lint.log
+      - name: Synthesize generic netlist and check structure
+        run: make synth | tee reports/synth.log
+      - name: Replay pin-level regression on synthesized netlist
+        run: make -C test SIM=icarus GATES=generic COCOTB_RESULTS_FILE=results-generic.xml | tee reports/generic.log
+      - name: Record executed validation and source provenance
+        run: python scripts/record_validation.py
+      - name: Commit passing netlist and verification evidence
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add build/netlist_generic.v build/netlist_generic.json build/netlist_generic.sha256 reports/latest.md reports/summary.json reports/software.xml reports/rtl.xml reports/generic.xml
+          git add -f reports/yosys.log
+          if ! git diff --cached --quiet; then
+            git commit -m "Record verified generic netlist and regression evidence [skip ci]"
+            git push origin HEAD:main
+          fi
+      - name: Upload netlist, test results, and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generic-netlist-and-verification
+          path: |
+            build/netlist_generic.*
+            build/yosys_generic.log
+            build/*.hex
+            build/*.bin
+            reports/
+            test/results-*.xml
+          if-no-files-found: error
