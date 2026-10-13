@@ -1,8 +1,67 @@
-# PinScript — programmable protocol-emulator ASIC (engineering prototype)
+# PinScript
 
-PinScript is an open-source, 64-instruction, cycle-deterministic PIO processor targeting the **Jane Street 2026 protocol-emulator ASIC competition** and **Tiny Tapeout IHP CMOS5L** (`cmos5l` Verilog template). The core is firmware programmable after fabrication. Five example programs cover **UART TX/RX**, **SPI master TX/full-duplex**, and **I²C open-drain writes** using one common engine.
+**A tiny programmable protocol I/O engine for UART, SPI and I²C.**
 
-> **Status: RTL, protocol regression and Yosys generic synthesis verified.** Executed test counts, source commit, tool versions and checksums are recorded in [reports/latest.md](reports/latest.md) and [reports/summary.json](reports/summary.json). The repository includes the generated Verilog/JSON netlist and JUnit evidence. Physical implementation, PDK mapping and silicon timing are outside this delivery.
+[![Regression](https://github.com/LOVE4KIMCHAEWON/pinscript-asic/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/LOVE4KIMCHAEWON/pinscript-asic/actions/workflows/test.yaml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
+PinScript is an open-source ASIC engineering prototype built for the **Jane Street 2026 protocol-emulator ASIC competition**, using the **Tiny Tapeout IHP CMOS5L** (`cmos5l`) interface. One cycle-deterministic 8-bit engine runs small protocol programs stored in 64 × 16-bit instruction memory. A separate SPI configuration port reloads firmware and starts or halts execution.
+
+- **Five protocol examples:** UART transmit/receive, SPI Mode 0 transmit/full duplex, and I²C open-drain writes.
+- **Programmable pin timing:** 8 bidirectional GPIO, per-pin output enable, cycle-counted waits and conditional branches.
+- **Small toolchain:** an assembler, Python ISA reference model, Cocotb protocol tests and a Linux SPI uploader.
+- **Reproducible verification:** GitHub Actions tests the software model, RTL and Yosys generic netlist, then publishes the generated evidence.
+
+[Quick start](#quick-start) · [Architecture](docs/ARCHITECTURE.md) · [Firmware examples](firmware/) · [Verification report](reports/latest.md) · [Verilog netlist](build/netlist_generic.v) · [CI guide](docs/CI_GUIDE.md)
+
+## Recorded verification
+
+The [verified Actions run](https://github.com/LOVE4KIMCHAEWON/pinscript-asic/actions/runs/38347520297) completed all three regression suites with zero failures and zero skipped tests:
+
+| Check | Recorded result | Evidence |
+| --- | ---: | --- |
+| Python ISA reference tests | **16 / 16 passed** | [Software JUnit report](reports/software.xml) |
+| RTL pin-level and protocol tests | **20 / 20 passed** | [RTL JUnit report](reports/rtl.xml) |
+| Same tests on synthesized generic netlist | **20 / 20 passed** | [Netlist JUnit report](reports/generic.xml) |
+| Yosys generic synthesis | **3,572 cells**, no unmapped memories | [Verilog](build/netlist_generic.v) · [JSON](build/netlist_generic.json) · [Synthesis log](reports/yosys.log) |
+
+Source commit, tool versions and checksums are recorded in [the full report](reports/latest.md) and [machine-readable summary](reports/summary.json). These results cover functional simulation and generic synthesis. PDK mapping, physical timing, GDS, place-and-route and hardware validation have not been performed.
+
+<details>
+<summary>中文简介</summary>
+
+PinScript 是一个可通过独立 SPI 接口加载程序的微型协议 I/O 处理器，使用同一套 8 位执行引擎实现 UART、SPI 和 I²C 示例。工程包含 Verilog RTL、汇编器、参考模型、协议测试与 Yosys 通用综合网表。已记录的软件测试为 16/16，RTL 测试和综合网表测试均为 20/20；当前成果覆盖功能验证和通用综合，尚未进行 PDK 映射、GDS 或布局布线。
+
+</details>
+
+## Quick start
+
+On Ubuntu with Python 3.10+:
+
+```bash
+git clone https://github.com/LOVE4KIMCHAEWON/pinscript-asic.git
+cd pinscript-asic
+sudo apt-get update
+sudo apt-get install -y make iverilog yosys verilator
+python3 -m pip install -r requirements-test.txt
+make verify
+```
+
+`make verify` assembles the example firmware, runs the software and RTL tests, generates a Yosys generic netlist, and replays the protocol tests on that netlist. Generated outputs are placed in `build/`. See [build commands](#software-rtl-and-netlist-build) for individual stages and [VERIFICATION.md](VERIFICATION.md) for the validation scope.
+
+## At a glance
+
+```mermaid
+flowchart LR
+    Host[Host programmer] -->|Configuration SPI| Loader[Write / Run / Halt]
+    Loader --> Memory["64 × 16-bit instruction memory"]
+    Memory --> Core["8-bit PinScript engine: A, B, X, PC"]
+    Core -->|Output and output enable| GPIO[8 bidirectional protocol GPIO]
+    GPIO -->|Sampled inputs| Core
+    Core --> Debug[Debug / captured-byte output]
+```
+
+The configuration SPI port is separate from the protocol GPIO. Firmware determines the protocol and pin schedule; the reference programs demonstrate the engine's capabilities rather than complete peripheral controllers.
 
 ## Hardware architecture
 
