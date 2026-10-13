@@ -1,43 +1,23 @@
-# PinScript v2 delivery — 2026-10-13
+# PinScript RTL/netlist delivery
 
-**Project scope:** FPGA/ASIC synthesizable RTL of an SPI-reprogrammable 8-pin
-protocol I/O processor and an automated simulation/synthesis workflow.
+The complete user-supplied v2 project is imported into the repository.
+[Import provenance](docs/IMPORT.md) records the original archive checksum.
 
-## Implemented
+Delivered files include synthesizable RTL, five assembled firmware examples,
+an assembler and SPI uploader, a software ISA model, 16 Python tests, 20
+external-pin RTL/netlist tests, synthesis automation, and a GitHub Actions
+workflow. The UART and SPI startup drivers preload their idle values before
+enabling the pins.
 
-- 64×16 programmable instruction memory, 6-bit PC, 8-bit A/B/X registers,
-  zero flag, deterministic WAIT counter, GPIO output/OE registers.
-- Config SPI loader with WRITE, RUN, HALT and 3-stage async-input sampling.
-- True SPI Mode 0 full duplex via independent TX A / RX B accumulators;
-  UART TX/RX and I2C open-drain write demonstration programs.
-- Python assembler, SPI upload utility, reference ISA model, Cocotb RTL
-  tests, randomized clock-by-clock model comparison, GitHub Actions.
-- Yosys generic-cell netlist generator and gate-level Cocotb replay.
+The generated netlist is in `build/netlist_generic.v` and
+`build/netlist_generic.json`, with a SHA-256 checksum. Executed CI evidence
+is in `reports/latest.md`, `reports/summary.json`, the three JUnit files and
+`reports/yosys.log`. Full logs and firmware are also available as Actions
+artifacts. The report records its tested source commit and tool versions.
 
-## Evidence in author's environment
+See [VERIFICATION.md](VERIFICATION.md) for coverage, fixes, warning review and
+limits, and [docs/CI_GUIDE.md](docs/CI_GUIDE.md) for reproduction.
 
-- `make software` **15 passed** (including exhaustive 256 UART TX bytes and
-  256 SPI RX bytes); all five firmwares assembled, <=64 words each.
-- Python syntax, shell script syntax, `info.yaml` and CI YAML parsed.
-- RTL/cocotb and Yosys executable stages were attempted but could not run:
-  this environment lacks Cocotb, Icarus, Yosys and network package access.
-- No generic or IHP stdcell netlist, timing result, area estimate, GDS,
-  post-route validation, FPGA test, or silicon test is represented as done.
-
-## Files to start with
-
-- `src/project.v` — top-level synthesizable RTL
-- `docs/ARCHITECTURE.md` — timing and instruction set contract
-- `firmware/` and `build/*.hex, *.bin, *.lst` — executable examples
-- `test/test.py` — ten real RTL/generic-netlist Cocotb cases
-- `test/test_reference.py` — fifteen **executed** reference regressions
-- `scripts/synth_generic.sh` — runnable Yosys netlist build
-- `docs/CI_GUIDE.md` — run the entire RTL+netlist verification in GitHub Actions
-- `VERIFICATION.md` — exact limitations
-
-## Not a final competition submission
-
-Replace the entrant name in `info.yaml`, make the repository publicly
-accessible, run and fix RTL/gate-level regressions, and run IHP PDK mapping
-plus 6×4 validation/STA before claiming chip readiness. Physical hardening,
-GDS, DRC/LVS and tapeout have intentionally not been performed here.
+The scope ends at generic Yosys synthesis and functional netlist replay.
+The original GDS workflow is retained as an inactive reference. No physical
+design, PDK mapping, timing sign-off or competition submission was performed.

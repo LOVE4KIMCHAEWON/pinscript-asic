@@ -1,60 +1,62 @@
-# Generate and verify the generic netlist without local EDA tools
+# Reproduce RTL and generic-netlist verification
 
-## One-machine Linux flow
+## GitHub Actions
 
-Install Icarus Verilog, Yosys, and Python packages, following `README.md`.
-From the project root:
+Push to the repository or open **Actions → regression → Run workflow**.
+The active workflow `.github/workflows/test.yaml` uses Ubuntu 24.04 and
+Python 3.12. It installs Icarus Verilog, Yosys, Verilator and pinned Python
+dependencies, then:
+
+1. Assembles all five firmware examples and checks that committed outputs
+   match the regenerated files.
+2. Runs the software reference tests and the external-pin RTL suite.
+3. Lints RTL, synthesizes the generic netlist and runs structural assertions.
+4. Replays the same external-pin suite on the generated netlist.
+5. Records JUnit counts, source/firmware/netlist checksums, tool versions,
+   generic cell counts and reviewed lint warnings.
+
+On a passing `main` run, the workflow commits the generated netlist and
+verification evidence using the repository's Actions token. The resulting
+report identifies the tested source commit; the later artifact-only commit
+contains those outputs. The Actions token does not recursively trigger a
+new push workflow. Pull-request runs validate and upload artifacts without
+pushing generated files to `main`.
+
+The **generic-netlist-and-verification** artifact preserves logs, separate
+RTL/generic JUnit files, firmware, Verilog/JSON netlist and its checksum.
+For authoritative pass/fail and source provenance, read `reports/latest.md`
+and `reports/summary.json`, and check the linked Actions run.
+
+## Local Linux flow
 
 ```sh
+sudo apt-get update
+sudo apt-get install -y make iverilog yosys verilator
+python3 -m pip install -r requirements-test.txt
 make software
 make rtl
+make lint
 make synth
 make gate-test
 ```
 
-The `make synth` output files are:
+`make synth` writes `build/netlist_generic.v`, `.json`, `.sha256` and
+`build/yosys_generic.log`. To preserve independent JUnit files:
 
+```sh
+make rtl COCOTB_RESULTS_FILE=results-rtl.xml
+make gate-test COCOTB_RESULTS_FILE=results-generic.xml
+sha256sum -c build/netlist_generic.sha256
 ```
-build/netlist_generic.v
-build/netlist_generic.json
-build/netlist_generic.sha256
-build/yosys_generic.log
-```
 
-`make gate-test` reruns **the same 10 functional tests** against the
-post-Yosys **generic** netlist. Confirm both RTL and gate tests pass before
-claiming verified equivalence for the tested scenarios.
+Verilog and JSON synthesis output may vary across Yosys/ABC versions.
+Use the tool versions in the report when comparing generated files.
+Both simulation modes load firmware through the top-level SPI pins; tests
+do not depend on internal RTL register names.
 
-## No Linux setup: GitHub Actions
+## Physical design scope
 
-1. Create a repository and upload the entire contents of the ZIP, preserving
-   `.github/workflows/test.yaml` and directory structure. Replace the
-   placeholder `project.author` in `info.yaml` with your actual team name.
-2. Open **Actions → regression**, then choose **Run workflow**. It installs
-   Icarus and Yosys, assembles firmware and runs software/RTL/gate tests.
-3. Only if the workflow finishes green, open its result and download the
-   **generic-netlist-and-verification** artifact. This contains the generated
-   netlist, JSON, checksum, and Yosys synthesis report.
-4. Check the synthesis warnings, memory mapping (the 64×16 RAM typically
-   uses flip-flops in a generic technology), and gate-level test logs.
-
-This procedure has **not been executed by the authoring environment**. A
-successful script installation or source upload does not itself verify the
-circuit. If any step fails, the netlist cannot be treated as verified.
-
-## For eventual physical design
-
-A *generic* synthesized netlist cannot be used as a sign-off PDK netlist.
-Use the official IHP CMOS5L Tiny Tapeout template and its `gds` workflow for
-PDK mapping, routed standard cells and GDS. The project already contains a
-starter `.github/workflows/gds.yaml` but this flow is not proven here.
-
-IHP Tiny Tapeout gate-level simulation convention uses the **unpowered**
-`nl` netlist (not `pnl`): after a successful hardening flow, copy
-`runs/wokwi/final/nl/<top>.nl.v` to `test/gate_level_netlist.v` and use
-`cd test && make GATES=yes` with the correct `PDK_ROOT` installed.
-
-The official competition specifies a 6×4 tile allocation. The publicly
-visible stock CMOS5L template may not yet list 6×4 among its accepted tile
-sizes; use the contest-updated flow rather than silently changing the
-required area or assuming success.
+Only simulation and generic synthesis are active. The original physical
+workflow is preserved at `docs/templates/gds.yaml.disabled`; it cannot run
+from that location. Generic gates are not IHP standard cells, and no STA,
+GDS or place-and-route is performed by the active workflow.

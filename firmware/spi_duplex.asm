@@ -2,8 +2,8 @@
 ; 12 MHz system, 1 MHz SCK. A shifts transmitted bits only;
 ; B shifts received bits only. PIO0=SCK, PIO1=MOSI,
 ; PIO2=CSn, PIO3=MISO input. 6 clocks high/low per bit.
-    DIR 0x07
-    OUT 0x04
+    OUT 0x04          ; preload idle before enabling outputs
+    DIR 0x07          ; avoid a spurious CSn-low startup pulse
     LDI 0x96
     LDX 8
     OUT 0x00

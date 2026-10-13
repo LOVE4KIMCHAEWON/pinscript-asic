@@ -74,7 +74,7 @@ async def basic_load_run(dut):
 async def uart_waveform(dut):
     await reset(dut)
     # Program matches firmware/uart_tx.asm
-    program = [0x4001,0x3001,0x1055,0x2008,0x3000,0xC066,
+    program = [0x3001,0x4001,0x1055,0x2008,0x3000,0xC066,
                0xD000,0xC064,0x7000,0x8006,0x3001,0xC066,0x0001]
     await write_program(dut, program)
     monitor = cocotb.start_soon(capture(dut, 1600))
@@ -91,7 +91,7 @@ async def uart_waveform(dut):
 async def spi_master_mode0(dut):
     await reset(dut)
     # Program matches firmware/spi_mode0.asm, 0x96 MSB first.
-    program = [0x4007,0x3004,0x1096,0x2008,0x3000,0xD009,
+    program = [0x3004,0x4007,0x1096,0x2008,0x3000,0xD009,
                0xC001,0xF001,0xC004,0xF001,0x7001,0x8005,0x3004,0x0001]
     await write_program(dut, program)
     monitor = cocotb.start_soon(capture(dut, 600))

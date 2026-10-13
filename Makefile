@@ -2,7 +2,7 @@ PYTHON ?= python3
 .PHONY: all firmware software rtl synth gate-test verify lint clean-sim
 all: verify
 firmware:
-	@for p in firmware/*.asm; do $(PYTHON) tools/assemble.py "$$p"; done
+	@set -e; for p in firmware/*.asm; do $(PYTHON) tools/assemble.py "$$p"; done
 software: firmware
 	$(PYTHON) -m pytest -q test/test_reference.py
 rtl: firmware
@@ -15,4 +15,4 @@ verify: software rtl synth gate-test
 lint:
 	verilator --lint-only -Wall -Wno-fatal --top-module tt_um_pinscript src/project.v
 clean-sim:
-	rm -rf test/sim_build test/results.xml
+	rm -rf test/sim_build test/results.xml test/results-rtl.xml test/results-generic.xml

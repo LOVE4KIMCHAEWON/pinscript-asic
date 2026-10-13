@@ -30,6 +30,7 @@ jobs:
         run: |
           mkdir -p reports
           make firmware
+          git diff --exit-code -- build/*.bin build/*.hex build/*.lst
           python -m pytest -q test/test_reference.py --junitxml=reports/software.xml | tee reports/software.log
       - name: RTL pin-level and protocol regression
         run: make rtl COCOTB_RESULTS_FILE=results-rtl.xml | tee reports/rtl.log

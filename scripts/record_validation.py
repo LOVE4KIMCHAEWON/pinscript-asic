@@ -1,5 +1,6 @@
 """Record evidence only after every CI validation command has succeeded."""
 import hashlib
+from collections import Counter
 import json
 import os
 from pathlib import Path
@@ -32,10 +33,19 @@ def main():
     source_sha = os.environ.get('GITHUB_SHA') or version('git', 'rev-parse', 'HEAD')
     run_url = (f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/"
                f"{os.environ['GITHUB_RUN_ID']}")
+    module = json.loads((ROOT / 'build/netlist_generic.json').read_text())['modules']['tt_um_pinscript']
+    cells = Counter(cell['type'] for cell in module['cells'].values())
     summary = {
         'source_commit': source_sha, 'run_url': run_url,
         'rtl_sha256': hashlib.sha256((ROOT / 'src/project.v').read_bytes()).hexdigest(),
         'netlist_sha256': hashlib.sha256((ROOT / 'build/netlist_generic.v').read_bytes()).hexdigest(),
+        'firmware_sha256': {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                            for p in sorted((ROOT / 'build').glob('*.bin'))},
+        'synthesis': {'cell_count': sum(cells.values()),
+                      'cell_types': dict(sorted(cells.items())),
+                      'unmapped_memories': len(module.get('memories', {}))},
+        'lint_warnings': [line for line in (REPORTS / 'lint.log').read_text().splitlines()
+                          if line.startswith('%Warning-')],
         'suites': {name: results(REPORTS / f'{name}.xml')
                    for name in ['software', 'rtl', 'generic']},
         'tools': {'yosys': version('yosys', '-V'),
@@ -45,6 +55,9 @@ def main():
                   'cocotb': version('cocotb-config', '--version')},
         'scope': 'Generic synthesis and functional simulation; no PDK mapping, STA, GDS or place-and-route.'
     }
+    assert summary['suites']['rtl']['tests'] == summary['suites']['generic']['tests'], 'Suite counts differ'
+    assert all(line.startswith(('%Warning-DECLFILENAME:', '%Warning-UNUSEDSIGNAL:'))
+               for line in summary['lint_warnings']), 'Unreviewed lint warning category'
     (REPORTS / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
     lines = [
         '# Executed verification results', '',
@@ -59,7 +72,16 @@ def main():
               f"Netlist SHA-256: `{summary['netlist_sha256']}`", '',
               f"RTL SHA-256: `{summary['rtl_sha256']}`", '', '## Tool versions', '']
     lines += [f'- {name}: `{value}`' for name, value in summary['tools'].items()]
-    lines += ['', summary['scope'], '', 'See `yosys.log` for warnings and generic cell statistics.', '']
+    lines += ['', '## Generic synthesis statistics', '',
+              f"Total cells: **{summary['synthesis']['cell_count']}**. "
+              f"Unmapped memories: **{summary['synthesis']['unmapped_memories']}**.", '',
+              '| Cell type | Count |', '| --- | ---: |']
+    lines += [f'| `{name}` | {count} |' for name, count in sorted(cells.items())]
+    lines += ['', '## Lint warnings reviewed', '']
+    lines += [f'- `{line}`' for line in summary['lint_warnings']]
+    lines += ['', 'These warnings concern the top filename and intentionally unused '
+              'register/instruction bits; no latch, width, or multiple-driver warning was reported.', '',
+              summary['scope'], '', '[Synthesis log](yosys.log) contains the structural checks.', '']
     (REPORTS / 'latest.md').write_text('\n'.join(lines))
     print(json.dumps(summary, indent=2))
 

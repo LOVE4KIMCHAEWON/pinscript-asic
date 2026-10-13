@@ -132,9 +132,7 @@ async def spi_bus(dut, response=None, count=650):
             if frame["rising"]:
                 frames.append(frame)
             else:
-                # DIR precedes OUT in the examples: enabling CS can create
-                # an initial low pulse, with no clocks or transferred bits.
-                assert not frame["falling"]
+                raise AssertionError("unexpected CS-low pulse without SPI clocks")
             frame = None
 
         previous_clk, previous_mosi, previous_cs = clk, mosi, cs

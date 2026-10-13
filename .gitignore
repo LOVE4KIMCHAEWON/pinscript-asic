@@ -7,3 +7,5 @@ __pycache__/
 *.log
 test/sim_build/
 test/results.xml
+test/results-*.xml
+pytest-cache-files-*/

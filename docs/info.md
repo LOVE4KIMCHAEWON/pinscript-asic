@@ -39,4 +39,8 @@ Programming requires an SPI master and a system clock. I²C requires appropriate
 
 ## Project status
 
-Prototype RTL + firmware and 16 passing Python reference tests; 10 Cocotb RTL tests and automated generic synthesis are provided but not yet executed in this environment. PDK mapping, STA, GDS and physical sign-off remain unverified.
+RTL, firmware, software reference tests and the external-pin RTL/generic-netlist
+regressions are exercised in GitHub Actions. Exact executed counts, tool
+versions, synthesis statistics and source provenance are in
+`reports/latest.md` and `reports/summary.json`. PDK mapping, STA, GDS and
+physical implementation are outside this delivery.
