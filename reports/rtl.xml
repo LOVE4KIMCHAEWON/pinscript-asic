@@ -1,0 +1,23 @@
+<testsuites name="results">
+  <testsuite name="all" package="all">
+    <property name="random_seed" value="1791866006" />
+    <testcase name="basic_load_run" classname="test" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test.py" lineno="61" time="0.09801387786865234" sim_time_ns="18950.0" ratio_time="193339.96789102408" />
+    <testcase name="uart_waveform" classname="test" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test.py" lineno="73" time="0.3078577518463135" sim_time_ns="52401.0" ratio_time="170211.72826000254" />
+    <testcase name="spi_master_mode0" classname="test" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test.py" lineno="90" time="0.24323201179504395" sim_time_ns="44961.0" ratio_time="184848.20179790215" />
+    <testcase name="i2c_ack_and_nack" classname="test" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test.py" lineno="109" time="1.581390142440796" sim_time_ns="292241.0" ratio_time="184800.06429592433" />
+    <testcase name="uart_receives_byte" classname="test" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test.py" lineno="144" time="0.23651814460754395" sim_time_ns="47780.0" ratio_time="202014.09950717166" />
+    <testcase name="spi_duplex_receives_byte" classname="test" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test.py" lineno="164" time="0.2847325801849365" sim_time_ns="50581.0" ratio_time="177643.87892368046" />
+    <testcase name="cpu_isa_random_differential" classname="test" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test.py" lineno="201" time="2.2524309158325195" sim_time_ns="443111.00000000006" ratio_time="196725.678414968" />
+    <testcase name="config_write_wraparound_and_halt" classname="test" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test.py" lineno="263" time="0.05865836143493652" sim_time_ns="11470.0" ratio_time="195539.04540484736" />
+    <testcase name="wait_pause_and_resume" classname="test" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test.py" lineno="282" time="0.09625434875488281" sim_time_ns="19161.0" ratio_time="199066.33048647578" />
+    <testcase name="i2c_bus_resolver_ack_and_nack" classname="test" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test.py" lineno="306" time="1.594756841659546" sim_time_ns="300241.0000000001" ratio_time="188267.57293454307" />
+    <testcase name="loader_reframes_unknown_and_truncated_commands" classname="test_control" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test_control.py" lineno="38" time="0.18612432479858398" sim_time_ns="39231.0" ratio_time="210778.46779271952" />
+    <testcase name="loader_halt_preserves_gpio_and_clears_result_mux" classname="test_control" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test_control.py" lineno="73" time="0.2214975357055664" sim_time_ns="44001.0" ratio_time="198652.3229698136" />
+    <testcase name="run_resets_all_execution_state" classname="test_control" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test_control.py" lineno="97" time="0.4108567237854004" sim_time_ns="83691.0" ratio_time="203698.7474098481" />
+    <testcase name="synchronous_reset_preserves_loaded_instruction_memory" classname="test_control" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test_control.py" lineno="130" time="0.08395552635192871" sim_time_ns="16831.0" ratio_time="200475.18884518722" />
+    <testcase name="execution_pc_wraps_at_instruction_63" classname="test_control" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test_control.py" lineno="151" time="0.08258295059204102" sim_time_ns="16591.0" ratio_time="200901.03200549688" />
+    <testcase name="loader_accepts_conservative_asynchronous_spi_edges" classname="test_control" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test_control.py" lineno="168" time="0.17547345161437988" sim_time_ns="42741.0" ratio_time="243575.30787009044" />
+    <testcase name="i2c_start_stop_and_ack_slots" classname="test_protocol_edges" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test_protocol_edges.py" lineno="60" time="2.399263858795166" sim_time_ns="450241.0" ratio_time="187657.97615360934" />
+    <testcase name="spi_mode0_setup_hold_and_duplex_patterns" classname="test_protocol_edges" file="/home/runner/work/pinscript-asic/pinscript-asic/test/test_protocol_edges.py" lineno="146" time="1.3035292625427246" sim_time_ns="246821.0" ratio_time="189348.26174791006" />
+  </testsuite>
+</testsuites>
